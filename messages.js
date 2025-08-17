@@ -20,8 +20,7 @@ function getAboutMessage() {
       **About Contest Kitty**
 Contest Kitty is a helpful Discord bot designed to keep you updated with upcoming coding contests and allow you to compare your Codeforces contest performance with others.
 
-      **Author:**
-      Shivam Gupta.
+      **Author:** Shivam Gupta.
       **Linkedin:**  https://www.linkedin.com/in/cse-shivam-gupta/
       **Linkedin:**  https://leetcode.com/u/CS_2201640100272/
       **Contact:** shivamgupta35967@gmail.com

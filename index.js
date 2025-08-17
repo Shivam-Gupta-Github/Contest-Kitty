@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import axios from "axios";
 import { getHelpMessage, getAboutMessage } from "./messages.js";
 import keepAlive from "./server.js";
+import getComparison from "./compareUserLC.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -32,7 +33,7 @@ async function getCodeforcesContests() {
 // Fetch Leetcode contests from Codeforces
 async function getLeetcodeContests() {
   const response = await axios.get(
-    "https://competeapi.vercel.app/contests/leetcode/",
+    "https://competeapi.vercel.app/contests/leetcode/"
   );
   const contests = response.data.data.topTwoContests.map((contest) => ({
     name: contest.title,
@@ -45,7 +46,7 @@ async function getLeetcodeContests() {
 async function getCodeforcesUserRating(handle) {
   try {
     const response = await axios.get(
-      `https://codeforces.com/api/user.rating?handle=${handle}`,
+      `https://codeforces.com/api/user.rating?handle=${handle}`
     );
     return response.data.result;
   } catch (error) {
@@ -73,7 +74,9 @@ async function getLastContestData(handles) {
         contestName = contestName.slice(0, 35) + "...";
       }
 
-      resultMessage += `${handle.padEnd(12)}| ${contestName.padEnd(40)}| ${String(lastContest.rank).padEnd(6)}| ${lastContest.newRating}\n`;
+      resultMessage += `${handle.padEnd(12)}| ${contestName.padEnd(
+        40
+      )}| ${String(lastContest.rank).padEnd(6)}| ${lastContest.newRating}\n`;
     } else {
       resultMessage += `${handle.padEnd(12)}| No contest data available.\n`;
     }
@@ -116,16 +119,40 @@ client.on("interactionCreate", async (interaction) => {
       "------------|------------------------------------------|----------------------\n";
 
     codeforcesContests.forEach((contest) => {
-      message += `Codeforces  | ${contest.name.padEnd(40)} | ${contest.startTime}\n`;
+      message += `Codeforces  | ${contest.name.padEnd(40)} | ${
+        contest.startTime
+      }\n`;
     });
 
     leetcodeContests.forEach((contest) => {
-      message += `LeetCode    | ${contest.name.padEnd(40)} | ${contest.startTime}\n`;
+      message += `LeetCode    | ${contest.name.padEnd(40)} | ${
+        contest.startTime
+      }\n`;
     });
 
     message += "```";
 
     await interaction.reply(message);
+  }
+
+  if (interaction.commandName === "leet-duel") {
+    const handles = interaction.options.getString("handles").split(" ");
+    if (handles.length !== 2) {
+      return interaction.reply(
+        "Please provide exactly two LeetCode usernames."
+      );
+    }
+    await interaction.deferReply(); // Defer the reply
+
+    try {
+      const message = await getComparison(handles[0], handles[1]);
+      await interaction.editReply(message); // Edit the deferred reply
+    } catch (error) {
+      console.error("Error in leet-duel command:", error);
+      await interaction.editReply(
+        "An error occurred while processing your request. Please try again later."
+      ); // Handle errors
+    }
   }
 });
 

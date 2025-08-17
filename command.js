@@ -30,6 +30,19 @@ const commands = [
       },
     ],
   },
+  {
+    name: "leet-duel",
+    description:
+      "Roast their weaknesses, praise their strengths: LeetCode profile duel!",
+    options: [
+      {
+        name: "handles",
+        type: 3, // STRING type
+        description: "Space-separated Codeforces handles",
+        required: true,
+      },
+    ],
+  },
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
